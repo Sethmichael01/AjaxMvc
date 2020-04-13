@@ -1,0 +1,97 @@
+﻿@model IEnumerable<AjaxMVC.Models.TransactionModel>
+
+
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.AccountNumber)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.BeneficiaryName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Date)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Amount)
+            </th>
+            <th>
+                <a onclick="showInPopup('@Url.Action("AddOrEdit", "TransactionModels", null, Context.Request.Scheme)','New Transaction')" class="btn btn-success text-white">
+                    <i class="fas fa-random"></i>New Transaction
+                </a>
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.AccountNumber)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.BeneficiaryName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Date)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Amount)
+                </td>
+                <td>
+                    <a onclick="showInPopup('@Url.Action("AddOrEdit", "TransactionModels", new {id = item.TransactionId }, Context.Request.Scheme)','Update Transaction')" class="btn btn-info text-white">
+                        <i class="fas fa-pencil-alt"></i>Edit
+                    </a>
+                    @*<a asp-action="Edit" asp-route-id="@item.TransactionId">Edit</a> |*@
+                    <a asp-action="Delete" asp-route-id="@item.TransactionId">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<script>
+    showInPopup = (url, title) => {
+    $.ajax({
+        type: "GET",
+        url: url,
+        success: function (res) {
+            $("#form-modal .modal-body").html(res);
+            $("#form-modal .modal-title").html(title);
+            $("#form-modal").modal('show');
+        }
+    })
+};
+
+jQueryAjaxPost = form => {
+    try {
+        $.ajax({
+            type: 'POST',
+            url: form.action,
+            data: new FormData(form),
+            contentType: false,
+            processData: false,
+            success: function (res) {
+                if (res.isValid) {
+                    $("#view-all").html(res);
+                    $("#form-modal .modal-body").html('');
+                    $("#form-modal .modal-title").html('');
+                    $("#form-modal").modal('hide');
+                }
+                else
+                    $("#form-modal .modal-body").html(res.html);
+            },
+            error: function (err) {
+                console.log(err);
+            }
+        })
+    }
+    catch (e) {
+        console.log(e);
+    }
+    return false;
+}
+
+</script>
